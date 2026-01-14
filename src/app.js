@@ -1,8 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
+const db = require('./config/db');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+
+const authenticateToken = require('./middleware.js/auth');
 
 
 
@@ -62,6 +65,37 @@ app.get('/status', (req, res) => {
 app.get('/redirect', (req, res) => {
   res.redirect('https://www.example.com');
 });
+
+app.get('/search/html', (req, res) => {
+  
+  const query = req.query.q || 'ninguno';
+  const category = req.query.categoria || 'todas';
+  res.send(`
+    <html>
+      <body>
+        <h1>Resultados de busqueda</h1>
+        <p>Termino: ${query}</p>
+        <p>Categoria: ${category}</p>
+      </body>
+    </html>
+  `);
+});
+
+
+app.get('/protected-route', authenticateToken, (req, res) => {
+  res.json({ message: 'Acceso concedido a la ruta protegida', user: req.user });
+});
+
+app.post('/register', async (req, res) => {
+  const { name, password, email,role } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);})
+
+
+
+
+
+
+
 
 
 app.listen(PORT, () => {
